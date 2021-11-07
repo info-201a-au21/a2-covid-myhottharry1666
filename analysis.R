@@ -309,7 +309,11 @@ has_discrepancy <- joined_states %>%
 # between the sum of the county cases and the reported state cases.
 # `state_highest_difference`.
 # (hint: you may want to create a new column in `has_discrepancy` to do this.)
-
+state_highest_difference <- has_discrepancy %>%
+  group_by(state) %>%
+  summarise(differece = sum(abs(cases - county_totals))) %>%
+  filter(differece == max(differece)) %>%
+  pull(state)
 
 # Independent exploration -------------------------------------------------
 
