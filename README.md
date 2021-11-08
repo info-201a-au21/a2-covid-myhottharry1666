@@ -30,3 +30,5 @@ You should start this assignment by opening up your `analysis.R` script. The scr
 - Why are there so many observations (counties) in the variable `lowest_in_each_state` (i.e., wouldn't you expect the number to be ~50)?
   - It is possible that there are some counties / locations with the same number of cases / deaths. Thus, with further conditions, those counties in the same state with the same number will be returned together.
 - What surprised you the most throughout your analysis?
+  - In general, since the beginning of 2021, most residents in US begin to get vaccination. Thus, I am wondering the effectiveness of vaccination. I decide to test this by comparing the daily average number of death before massive vaccination and the daily average after massive vaccination.
+  - The result is quite obvious. The daily average deaths after massive vaccination is smaller than that before, by 13.94. To a huge degree, this can prove that vaccines are effective in reducing the number of deaths.

@@ -232,14 +232,25 @@ lowest_in_each_state <- counties %>%
 # with both the state name, and the proportion (`prop`) in a variable
 # called `prop_no_deaths`
 # (this one is tricky.... take your time)
-num_counties <- group_by(counties, state)
-num_counties <- summarise(num_counties, num_coun=count(location))
-no_death <- group_by(counties, state)
-no_death <- summarise(num_no_death = count())
+num_counties <- counties %>%
+  group_by(state) %>%
+  summarise(num_count = n_distinct(county)) %>%
+  select(state, num_count)
+no_death <- counties %>%
+  group_by(state) %>%
+  filter(deaths == 0) %>%
+  summarise(num_count_0 = n_distinct(county)) %>%
+  select(state, num_count_0)
+count_data <- left_join(num_counties, no_death, by = "state")
+prop_no_deaths <- count_data %>%
+  mutate(prop = num_count_0 / num_count) %>%
+  select(state, prop)
 
 # What proportion of counties in Washington have had zero deaths?
 # `wa_prop_no_deaths`
-
+wa_prop_no_deaths <- prop_no_deaths %>%
+  filter(state == "Washington") %>%
+  pull(prop)
 
 # The following is a check on our understanding of the data.
 # Presumably, if we add up all of the cases on each day in the
@@ -292,11 +303,11 @@ num_county_diff <- nrow(num_county_diff)
 # an odd behavior....)
 sum_county_to_state <- counties %>%
   group_by(state, date) %>%
-  summarise(county_totals = sum(cases))
+  summarise(county_totals = sum(cases), .groups = "drop")
 
 # Then, let's join together the `sum_county_to_state` dataframe with the
 # `states` dataframe into the variable `joined_states`.
-joined_states <- left_join(sum_county_to_state, states, by="state")
+joined_states <- left_join(sum_county_to_state, states, by=c("state", "date"))
 
 # To find out where (and when) there is a discrepancy in the number of cases,
 # create the variable `has_discrepancy`, which has *only* the observations
@@ -319,5 +330,28 @@ state_highest_difference <- has_discrepancy %>%
 
 # Ask your own 3 questions: in the section below, pose 3 questions,
 # then use the appropriate code to answer them.
+
+# What is distribution of number of deaths since 2021/01/01? 
+# What is distribution of number of deaths before 2021/01/01, after 2020/06/01?
+# Answer this by create two dataframe, one is before_01_01, one is since_01_01;
+# in each one, list date and number of deaths.
+before_01_01 <- national %>%
+  filter(date >= "2020-09-01" & date < "2021-01-01") %>%
+  select(date, new_deaths)
+since_01_01 <- national %>%
+  filter(date >= "2021-01-01") %>%
+  select(date, new_deaths)
+
+# What is the average number of deaths since 2021/01/01?
+# What is the average number of deaths before 2021/01/01, after 2020/06/01?
+# Answer this by two varaibles, each storing value. One is avg_before,
+# one is avg_since.
+avg_before <- mean(before_01_01$new_deaths, na.rm = TRUE)
+avg_since <- mean(since_01_01$new_deaths, na.rm = TRUE)
+
+# Which average number is huger? By how much?
+print(avg_since > avg_before)
+print(avg_since - avg_before)
+
 
 # Reflection: What surprised you the most throughout your analysis?
