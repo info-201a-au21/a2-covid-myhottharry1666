@@ -34,6 +34,7 @@ counties <- read.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/ma
 # How many observations (rows) are in each dataset?
 # Create `obs_national`, `obs_states`, `obs_counties`
 obs_nation <- nrow(national)
+#[Ray] It's obs_national. Not obs_nation
 obs_states <- nrow(states)
 obs_counties <- nrow(counties)
 
@@ -245,12 +246,14 @@ count_data <- left_join(num_counties, no_death, by = "state")
 prop_no_deaths <- count_data %>%
   mutate(prop = num_count_0 / num_count) %>%
   select(state, prop)
+#[Ray] You need to get the most recent event, wihch means theget the most recent date.
 
 # What proportion of counties in Washington have had zero deaths?
 # `wa_prop_no_deaths`
 wa_prop_no_deaths <- prop_no_deaths %>%
   filter(state == "Washington") %>%
   pull(prop)
+#[Ray] Similar. Get the most recent date.
 
 # The following is a check on our understanding of the data.
 # Presumably, if we add up all of the cases on each day in the
