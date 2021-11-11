@@ -33,7 +33,7 @@ counties <- read.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/ma
 
 # How many observations (rows) are in each dataset?
 # Create `obs_national`, `obs_states`, `obs_counties`
-obs_nation <- nrow(national)
+obs_national <- nrow(national)
 #[Ray] It's obs_national. Not obs_nation
 obs_states <- nrow(states)
 obs_counties <- nrow(counties)
@@ -235,16 +235,18 @@ lowest_in_each_state <- counties %>%
 # (this one is tricky.... take your time)
 num_counties <- counties %>%
   group_by(state) %>%
+  filter(date == max(date, na.rm = TRUE)) %>%
   summarise(num_count = n_distinct(county)) %>%
   select(state, num_count)
 no_death <- counties %>%
   group_by(state) %>%
+  filter(date == max(date, na.rm = TRUE)) %>%
   filter(deaths == 0) %>%
   summarise(num_count_0 = n_distinct(county)) %>%
   select(state, num_count_0)
 count_data <- left_join(num_counties, no_death, by = "state")
 prop_no_deaths <- count_data %>%
-  mutate(prop = num_count_0 / num_count) %>%
+  mutate(prop = if_else(is.na(num_count_0), 0/num_count, num_count_0/num_count)) %>%
   select(state, prop)
 #[Ray] You need to get the most recent event, wihch means theget the most recent date.
 
